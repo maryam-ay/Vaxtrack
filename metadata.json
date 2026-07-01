@@ -1,0 +1,6 @@
+{
+  "name": "National Vaccine Dashboard",
+  "description": "Mobile-first immunization vaccine inventory and stock level dashboard prototype for state and local government authorities.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
