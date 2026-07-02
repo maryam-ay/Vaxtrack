@@ -49,3 +49,24 @@ export interface StateData {
   vaccines: Record<string, number>;
   lgas?: LGAData[];
 }
+
+export interface PermissionItem {
+  id: string;
+  label: string;
+}
+
+export interface PermissionGroup {
+  id: string;
+  title: string;
+  items: PermissionItem[];
+}
+
+export interface RoleRecord {
+  id: string;
+  name: string;
+  description: string;
+  // Map of permissionId -> boolean
+  permissions: Record<string, boolean>;
+  // Set of permissionIds that are locked for this role
+  lockedPermissions: string[];
+}

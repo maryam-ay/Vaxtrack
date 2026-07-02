@@ -17,9 +17,11 @@ import {
   Layers,
   Database,
   Filter,
-  LayoutGrid
+  LayoutGrid,
+  ArrowLeft,
+  Upload
 } from 'lucide-react';
-import { StateData, KPIIndicator, StockStatus } from './types';
+import { StateData, KPIIndicator, StockStatus, RoleRecord } from './types';
 import { 
   INITIAL_KPI_INDICATORS, 
   INITIAL_STATES_DATA, 
@@ -30,17 +32,29 @@ import { KPIGrid } from './components/KPIGrid';
 import { LegendFilter } from './components/LegendFilter';
 import { StateCard } from './components/StateCard';
 import { StockMatrixTable } from './components/StockMatrixTable';
-import { NavigationDrawer } from './components/NavigationDrawer';
+import { NavigationDrawer, SidebarContent } from './components/NavigationDrawer';
 import { AllocationsView } from './components/AllocationsView';
 import { DeliveriesView } from './components/DeliveriesView';
 import { ReportsView } from './components/ReportsView';
 import { NotificationsView } from './components/NotificationsView';
+import { UsersView } from './components/UsersView';
+import { FacilitySetupView } from './components/FacilitySetupView';
+import { ColdChainStoreSetupView } from './components/ColdChainStoreSetupView';
+import { RolesAndPermissionsView, INITIAL_ROLES } from './components/RolesAndPermissionsView';
+import { ThreePLSetupView } from './components/ThreePLSetupView';
+import OrganisationUnitSetupView from './components/OrganisationUnitSetupView';
+import NSCSSetupView from './components/NSCSSetupView';
+import MaximumStockView from './components/MaximumStockView';
 
 export default function App() {
   // Navigation & Drawer state
   const [isNavDrawerOpen, setIsNavDrawerOpen] = useState(false);
   const [activeNavItem, setActiveNavItem] = useState('dashboard');
   const [isNewAllocModalOpen, setIsNewAllocModalOpen] = useState(false);
+  const [isNewUserModalOpen, setIsNewUserModalOpen] = useState(false);
+  const [isMobileDetailOpen, setIsMobileDetailOpen] = useState(false);
+  const [roles, setRoles] = useState<RoleRecord[]>(INITIAL_ROLES);
+  const [selectedRoleId, setSelectedRoleId] = useState<string>('state_store_officer');
   
   // Dynamic App State (so user can edit/simulate live!)
   const [states, setStates] = useState<StateData[]>(INITIAL_STATES_DATA);
@@ -312,10 +326,19 @@ export default function App() {
     updateLastUpdatedTime();
   };
 
+  const activeRole = roles.find(r => r.id === selectedRoleId) || roles[0];
+
   return (
-    <div className="min-h-[100dvh] flex flex-col bg-slate-50 font-sans text-slate-800" id="main-app-container">
-      {/* HEADER / NAVIGATION BAR: Responsive header with 44px minimum target triggers */}
-      <header className="sticky top-0 bg-brand-teal-900 text-white z-30 shadow-md px-4 py-3 flex items-center justify-between min-h-[56px]" id="app-header">
+    <div className="min-h-[100dvh] flex bg-slate-50 font-sans text-slate-800" id="main-app-container">
+      {/* PERSISTENT DESKTOP SIDEBAR */}
+      <aside className="hidden md:flex w-[280px] shrink-0 bg-brand-teal-900 text-white flex-col h-screen sticky top-0 border-r border-brand-teal-800/40">
+        <SidebarContent activeItem={activeNavItem} onSelectItem={setActiveNavItem} />
+      </aside>
+
+      {/* WORKSPACE WRAPPER */}
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
+        {/* HEADER / NAVIGATION BAR: Responsive header with 44px minimum target triggers */}
+        <header className="sticky top-0 bg-brand-teal-900 text-white z-30 shadow-md px-4 py-3 flex items-center justify-between min-h-[56px] md:hidden" id="app-header">
         <div className="flex items-center gap-3">
           {/* Hamburger Menu Trigger: 44px min target */}
           <button
@@ -327,9 +350,11 @@ export default function App() {
           </button>
 
           <div className="flex flex-col">
-            <div className="flex items-center gap-1.5">
-              <span className="font-extrabold font-display text-base tracking-wide">VaxTrack</span>
-              <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[8px] font-bold px-1.5 py-0.2 rounded-full uppercase tracking-wider font-mono">
+            <div className="flex items-center gap-1">
+              <span className="font-extrabold font-display text-2xl tracking-tight text-white leading-none">
+                Vaxtrack
+              </span>
+              <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider font-mono ml-1">
                 ADMIN
               </span>
             </div>
@@ -369,9 +394,7 @@ export default function App() {
               <h1 className="text-xl font-bold font-display text-slate-800 tracking-tight">
                 Deliveries
               </h1>
-              <span className="text-[10px] text-slate-400 font-medium font-sans">
-                Wednesday, 1 July 2026
-              </span>
+
             </div>
             <button
               onClick={() => {
@@ -392,9 +415,7 @@ export default function App() {
               <h1 className="text-xl font-bold font-display text-slate-800 tracking-tight">
                 Reports
               </h1>
-              <span className="text-[10px] text-slate-400 font-medium font-sans">
-                Wednesday, 1 July 2026
-              </span>
+
             </div>
             <button
               onClick={() => {
@@ -409,6 +430,79 @@ export default function App() {
           </div>
         </section>
       ) : activeNavItem === 'notifications' ? (
+        null
+      ) : activeNavItem === 'users' ? (
+        <section className="bg-white border-b border-slate-100 px-4 py-3 flex flex-col gap-1" id="sub-header-section">
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col">
+              <h1 className="text-xl font-bold font-display text-slate-800 tracking-tight">
+                User Management
+              </h1>
+              
+            </div>
+            <button
+              onClick={() => setIsNewUserModalOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-teal-600 hover:bg-brand-teal-700 text-white rounded-lg text-xs font-bold transition-all shadow-2xs select-none cursor-pointer min-h-[36px]"
+              id="header-add-user-btn"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add User</span>
+            </button>
+          </div>
+        </section>
+      ) : activeNavItem === 'ehf-uhf' ? (
+        <section className="bg-white border-b border-slate-100 px-4 py-3 flex flex-col gap-1" id="sub-header-section">
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col">
+              <h1 className="text-xl font-bold font-display text-slate-800 tracking-tight">
+                EHF & UHF Setup
+              </h1>
+            </div>
+            <button
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-teal-800 hover:bg-brand-teal-900 text-white rounded-lg text-xs font-bold transition-all shadow-2xs select-none cursor-pointer min-h-[36px]"
+              id="header-add-facility-btn"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add Facility</span>
+            </button>
+          </div>
+        </section>
+      ) : activeNavItem === 'lcs-scs' ? (
+        <section className="bg-white border-b border-slate-100 px-4 py-3 flex flex-col gap-1" id="sub-header-section">
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col">
+              <h1 className="text-xl font-bold font-display text-slate-800 tracking-tight">
+                Cold Chain Store Setup
+              </h1>
+              
+
+            </div>
+          </div>
+        </section>
+      ) : activeNavItem === 'roles' ? (
+        <section className="bg-white border-b border-slate-100 px-4 py-3 flex flex-col gap-1" id="sub-header-section">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {isMobileDetailOpen && (
+                <button
+                  onClick={() => setIsMobileDetailOpen(false)}
+                  className="flex items-center gap-1.5 text-xs text-brand-teal-600 font-bold hover:text-brand-teal-700 cursor-pointer"
+                >
+                  <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
+                </button>
+              )}
+              <div className="flex flex-col">
+                <h1 className="text-xl font-bold font-display text-slate-800 tracking-tight">
+                  Roles & Permissions
+                </h1>
+              </div>
+            </div>
+            
+            <div className="flex items-center ml-auto">
+            </div>
+          </div>
+        </section>
+      ) : activeNavItem === '3pl' || activeNavItem === 'org-unit' || activeNavItem === 'nscs' || activeNavItem === 'max-stock' ? (
         null
       ) : (
         <section className="bg-white border-b border-slate-100 px-4 py-3.5 flex flex-col gap-1.5" id="sub-header-section">
@@ -437,7 +531,7 @@ export default function App() {
 
       {/* CORE WORKSPACE / CONTENT SCROLL VIEW */}
       <main className={`flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-4 mx-auto w-full ${
-        activeNavItem === 'notifications' ? 'max-w-5xl' : 'max-w-lg'
+        activeNavItem === 'notifications' || activeNavItem === 'users' || activeNavItem === 'ehf-uhf' || activeNavItem === 'lcs-scs' || activeNavItem === 'roles' || activeNavItem === '3pl' || activeNavItem === 'org-unit' || activeNavItem === 'nscs' || activeNavItem === 'max-stock' ? 'max-w-5xl' : 'max-w-lg'
       }`} id="scrollable-content">
         {activeNavItem === 'allocations' ? (
           <AllocationsView isNewAllocModalOpen={isNewAllocModalOpen} setIsNewAllocModalOpen={setIsNewAllocModalOpen} />
@@ -447,6 +541,29 @@ export default function App() {
           <ReportsView />
         ) : activeNavItem === 'notifications' ? (
           <NotificationsView />
+        ) : activeNavItem === 'users' ? (
+          <UsersView isNewUserModalOpen={isNewUserModalOpen} setIsNewUserModalOpen={setIsNewUserModalOpen} />
+        ) : activeNavItem === 'ehf-uhf' ? (
+          <FacilitySetupView />
+        ) : activeNavItem === 'lcs-scs' ? (
+          <ColdChainStoreSetupView />
+        ) : activeNavItem === '3pl' ? (
+          <ThreePLSetupView />
+        ) : activeNavItem === 'org-unit' ? (
+          <OrganisationUnitSetupView />
+        ) : activeNavItem === 'nscs' ? (
+          <NSCSSetupView />
+        ) : activeNavItem === 'max-stock' ? (
+          <MaximumStockView />
+        ) : activeNavItem === 'roles' ? (
+          <RolesAndPermissionsView 
+            isMobileDetailOpen={isMobileDetailOpen} 
+            setIsMobileDetailOpen={setIsMobileDetailOpen} 
+            roles={roles}
+            setRoles={setRoles}
+            selectedRoleId={selectedRoleId}
+            setSelectedRoleId={setSelectedRoleId}
+          />
         ) : (
           <>
             {/* SECTION 1: KEY PERFORMANCE INDICATORS (2-column x 4-row Grid as Instructed) */}
@@ -741,6 +858,7 @@ export default function App() {
           </>
         )}
       </main>
+    </div>
 
 
 

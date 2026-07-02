@@ -217,17 +217,6 @@ export function ReportsView() {
   return (
     <div className="flex flex-col gap-4" id="reports-view-container">
       
-      {/* REPORTS HEADER BANNER */}
-      <div className="bg-gradient-to-br from-slate-50 to-teal-50/20 rounded-2xl p-4 border border-slate-100 flex flex-col gap-1.5 shadow-3xs" id="reports-header-banner">
-        <h2 className="text-sm font-bold text-slate-800 font-display flex items-center gap-1.5">
-          <FileText className="w-4 h-4 text-brand-teal-600" />
-          <span>Reports</span>
-        </h2>
-        <p className="text-[11px] text-slate-400 font-medium">
-          Generate and export supply chain reports
-        </p>
-      </div>
-
       {/* FILTERS PANEL */}
       <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex flex-col gap-4" id="reports-filters-card">
         {/* Select Report Dropdown */}

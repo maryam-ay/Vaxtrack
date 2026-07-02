@@ -174,9 +174,9 @@ export function DeliveriesView() {
 
 
       {/* TWO LARGE KPI CARDS - MATCHING USER SCREENSHOT */}
-      <div className="grid grid-cols-2 gap-3" id="deliveries-kpi-grid">
+      <div className="flex flex-row gap-3 overflow-x-auto pb-2 -mb-2" id="deliveries-kpi-grid">
         {/* LOGISTICS CARD */}
-        <div className="bg-white rounded-xl p-3 border border-slate-100 border-l-4 border-l-blue-500 shadow-2xs flex flex-col gap-1 select-none" id="kpi-logistics">
+        <div className="bg-white rounded-xl p-4 border border-slate-100 border-l-4 shadow-3xs flex flex-col gap-1 select-none min-w-[160px] flex-1" style={{ borderLeftColor: '#3b82f6' }} id="kpi-logistics">
           <span className="text-[9px] font-extrabold text-slate-400 tracking-wider font-display uppercase">
             LOGISTICS
           </span>
@@ -186,7 +186,7 @@ export function DeliveriesView() {
         </div>
 
         {/* PIPELINE CARD */}
-        <div className="bg-white rounded-xl p-3 border border-slate-100 border-l-4 border-l-amber-500 shadow-2xs flex flex-col gap-1 select-none" id="kpi-pipeline">
+        <div className="bg-white rounded-xl p-4 border border-slate-100 border-l-4 shadow-3xs flex flex-col gap-1 select-none min-w-[160px] flex-1" style={{ borderLeftColor: '#f59e0b' }} id="kpi-pipeline">
           <span className="text-[9px] font-extrabold text-slate-400 tracking-wider font-display uppercase">
             PIPELINE
           </span>
